@@ -1,0 +1,29 @@
+server:
+  port: 8000
+
+spring:
+  application:
+    name: nova-invest-backend
+  data:
+    mongodb:
+      uri: ${MONGO_URL}
+      database: ${DB_NAME}
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-hours: 12
+    refresh-token-days: 7
+  frontend-url: ${FRONTEND_URL}
+  admin:
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}
+  wallets:
+    btc: ${BTC_WALLET:bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh}
+    eth: ${ETH_WALLET:0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0}
+    usdt: ${USDT_WALLET:TXsRr49UbmqmYzKUwaRJt5A2XyN6qePmv3}
+
+logging:
+  level:
+    com.novainvest: INFO
