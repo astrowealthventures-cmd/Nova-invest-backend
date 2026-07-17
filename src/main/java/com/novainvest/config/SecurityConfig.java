@@ -18,6 +18,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 import jakarta.servlet.http.HttpServletResponse;
 
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -76,7 +77,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(frontendUrl));
+        // Now that a stable custom domain exists, restrict to real domains only -
+        // drop the *.vercel.app wildcard since we're no longer relying on
+        // ever-changing per-deployment preview URLs. FRONTEND_URL should be set
+        // to "https://astrowealthventures.com" (no www) in Railway's env vars;
+        // the www variant is added here so both work regardless of which one
+        // visitors actually type.
+        configuration.setAllowedOriginPatterns(List.of(
+                frontendUrl,
+                "https://www.astrowealthventures.com"
+        ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true); // needed so the browser sends the httpOnly cookies
