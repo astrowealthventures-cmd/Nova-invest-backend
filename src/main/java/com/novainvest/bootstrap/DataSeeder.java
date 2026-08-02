@@ -59,7 +59,7 @@ public class DataSeeder implements CommandLineRunner {
             User admin = new User();
             admin.setId(UUID.randomUUID().toString());
             admin.setEmail(email);
-            admin.setName("Casper");
+            admin.setFirstName("Casper");
             admin.setRole("admin");
             admin.setBalance(0.0);
             admin.setReferralCode("ADMIN");

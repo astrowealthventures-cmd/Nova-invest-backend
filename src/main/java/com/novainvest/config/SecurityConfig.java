@@ -1,6 +1,7 @@
 package com.novainvest.config;
 
 import com.novainvest.security.JwtAuthFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,8 +17,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
-import jakarta.servlet.http.HttpServletResponse;
-
 
 @Configuration
 @EnableWebSecurity
@@ -49,9 +48,12 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/register",
                                 "/api/auth/login",
+                                "/api/auth/verify",
                                 "/api/plans",
                                 "/api/deposits/wallets",
                                 "/api/market/ticker",
+                                "/api/auth/verify-forgotten-password",
+                                "/api/auth/forgotten-password",
                                 "/api/"
                         ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

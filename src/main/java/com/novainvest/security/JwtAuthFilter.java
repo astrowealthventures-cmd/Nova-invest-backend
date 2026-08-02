@@ -43,8 +43,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                     @NonNull HttpServletResponse response,
-                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
 
         String token = extractToken(request);
 
@@ -55,6 +55,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     String userId = claims.getSubject();
                     Optional<User> user = userRepository.findById(userId);
                     user.ifPresent(u -> {
+                        if (!u.isEnabled()) {
+                            return; // don't authenticate unverified users
+                        }
                         var authority = new SimpleGrantedAuthority("ROLE_" + u.getRole().toUpperCase());
                         var authToken = new UsernamePasswordAuthenticationToken(u, null, List.of(authority));
                         SecurityContextHolder.getContext().setAuthentication(authToken);

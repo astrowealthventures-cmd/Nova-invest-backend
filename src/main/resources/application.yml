@@ -16,13 +16,16 @@ app:
     access-token-hours: 12
     refresh-token-days: 7
   frontend-url: ${FRONTEND_URL}
+  brevo:
+    api-key: ${BREVO_EMAIL_KEY}
+  base-url: ${APP_BASE_URL:http://localhost:8000/api/auth}
   admin:
     email: ${ADMIN_EMAIL}
     password: ${ADMIN_PASSWORD}
   wallets:
-    btc: ${BTC_WALLET:bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh}
-    eth: ${ETH_WALLET:0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb0}
-    usdt: ${USDT_WALLET:TXsRr49UbmqmYzKUwaRJt5A2XyN6qePmv3}
+    btc: ${BTC_WALLET:bc1q96ge9unzzumwv2amfx3g9u26v8xpxp77sg0755}
+    eth: ${ETH_WALLET:0x1f55B93eFe09b82C166c811e1241309B319CA70c}
+    usdt: ${USDT_WALLET:TUfv1Xf7tdZvMeqjzRy3GnwHDqSxYLyAoe }
 
 logging:
   level:

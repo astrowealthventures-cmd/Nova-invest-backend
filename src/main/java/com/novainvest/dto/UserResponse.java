@@ -18,7 +18,7 @@ public class UserResponse {
 
     public static UserResponse from(User u) {
         return new UserResponse(
-                u.getId(), u.getEmail(), u.getName(), u.getRole(),
+                u.getId(), u.getEmail(), u.getFirstName(), u.getRole(),
                 u.getBalance(), u.getReferralCode(), u.getReferredBy(), u.getCreatedAt()
         );
     }
