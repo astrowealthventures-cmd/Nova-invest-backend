@@ -66,6 +66,7 @@ public class DataSeeder implements CommandLineRunner {
             admin.setReferredBy(null);
             admin.setCreatedAt(Instant.now().toString());
             admin.setPasswordHash(passwordEncoder.encode(adminPassword));
+            admin.setEnabled(true); // seeded admin should never need email verification
             userRepository.save(admin);
         } else if (!passwordEncoder.matches(adminPassword, existing.getPasswordHash())) {
             existing.setPasswordHash(passwordEncoder.encode(adminPassword));

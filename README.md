@@ -41,18 +41,7 @@ Set these before running — same names as your old FastAPI `.env`:
 | `ADMIN_PASSWORD`        | `Admin@12345`                                    | seeded admin account |
 | `BTC_WALLET` / `ETH_WALLET` / `USDT_WALLET` | wallet addresses | shown on the deposit page |
 
-**Windows (PowerShell), for a quick local run:**
-```powershell
-$env:MONGO_URL="mongodb://localhost:27017"
-$env:DB_NAME="test_database"
-$env:JWT_SECRET="paste-your-existing-secret-here"
-$env:FRONTEND_URL="http://localhost:3000"
-$env:ADMIN_EMAIL="admin@nova.invest"
-$env:ADMIN_PASSWORD="Admin@12345"
-$env:BTC_WALLET="bc1q..."
-$env:ETH_WALLET="0x..."
-$env:USDT_WALLET="T..."
-```
+
 
 **Or**, for simplicity while developing locally, just hardcode the defaults directly in
 `application.yml` instead of using env vars (fine for local dev, don't commit real secrets).
