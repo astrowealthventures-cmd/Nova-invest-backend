@@ -30,3 +30,8 @@ app:
 logging:
   level:
     com.novainvest: INFO
+
+cloudinary:
+    cloud-name: n2lt8c3v
+    api-key: 966935759218696
+    api-secret: YnbH2Yg5FEMXegqA4-IKH34L2gA

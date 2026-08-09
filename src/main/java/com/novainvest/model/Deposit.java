@@ -25,4 +25,5 @@ public class Deposit {
     private String status; // pending | approved | rejected
     private String createdAt;
     private String processedAt;
+    private String receiptUrl;
 }

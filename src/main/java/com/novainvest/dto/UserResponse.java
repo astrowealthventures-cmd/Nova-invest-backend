@@ -9,7 +9,7 @@ import lombok.Data;
 public class UserResponse {
     private String id;
     private String email;
-    private String name;
+    private String firstName;
     private String role;
     private double balance;
     private String referralCode;

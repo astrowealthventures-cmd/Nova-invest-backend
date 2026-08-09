@@ -18,6 +18,5 @@ public class DepositRequest {
     private Double amountUsd;
 
     @NotNull
-    @Size(min = 6)
-    private String txHash;
+    private String ReceiptUrl;
 }

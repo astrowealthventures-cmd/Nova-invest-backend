@@ -8,7 +8,9 @@ import com.novainvest.model.User;
 import com.novainvest.repository.DepositRepository;
 import com.novainvest.repository.TransactionRepository;
 import com.novainvest.repository.UserRepository;
+import com.novainvest.service.EmailService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,11 +25,13 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class DepositController {
 
     private final DepositRepository depositRepository;
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     @Value("${app.wallets.btc}")
     private String btcWallet;
@@ -36,12 +40,9 @@ public class DepositController {
     @Value("${app.wallets.usdt}")
     private String usdtWallet;
 
-    public DepositController(DepositRepository depositRepository, TransactionRepository transactionRepository,
-                              UserRepository userRepository) {
-        this.depositRepository = depositRepository;
-        this.transactionRepository = transactionRepository;
-        this.userRepository = userRepository;
-    }
+
+
+
 
     @GetMapping("/deposits/wallets")
     public Map<String, String> getWallets() {
@@ -53,13 +54,12 @@ public class DepositController {
     }
 
     @PostMapping("/deposits")
-    public Deposit createDeposit(@Valid @RequestBody DepositRequest body, @AuthenticationPrincipal User user) {
-        Deposit deposit = new Deposit();
+    public Deposit createDeposit(@Valid @RequestBody DepositRequest body, @AuthenticationPrincipal User user) { Deposit deposit = new Deposit();
         deposit.setId(UUID.randomUUID().toString());
         deposit.setUserId(user.getId());
         deposit.setAsset(body.getAsset());
         deposit.setAmountUsd(body.getAmountUsd());
-        deposit.setTxHash(body.getTxHash());
+        deposit.setReceiptUrl(body.getReceiptUrl()); // new
         deposit.setStatus("pending");
         deposit.setCreatedAt(Instant.now().toString());
         depositRepository.save(deposit);
@@ -111,6 +111,7 @@ public class DepositController {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
             u.setBalance(u.getBalance() + deposit.getAmountUsd());
             userRepository.save(u);
+            emailService.sendDepositReceived(u.getEmail(), deposit.getAmountUsd());
         }
 
         return Map.of("ok", true, "status", newStatus);
