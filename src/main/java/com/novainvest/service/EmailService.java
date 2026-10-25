@@ -45,7 +45,7 @@ public class EmailService {
     // ═══════════════════════════════════════════════════════════════════════════════
 
     public void sendVerificationEmail(String to, String token) {
-        String link = frontendUrl + "/verify?token=" + token;
+        String link = frontendUrl + "/verify-email?token=" + token;
 
         String body = sectionHeader("Verify your email") +
                 paragraph("Thanks for signing up for AstroWealthVentures. "

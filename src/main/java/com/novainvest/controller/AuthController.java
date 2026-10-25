@@ -10,21 +10,27 @@ import com.novainvest.security.JwtService;
 import com.novainvest.service.EmailService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/api/auth")
+@Slf4j
 public class AuthController {
 
     private final UserRepository userRepository;
@@ -71,7 +77,11 @@ public class AuthController {
         VerificationToken verificationToken = new VerificationToken(token,savedUser.getId());
         verificationTokenRepository.save(verificationToken);
 
-        emailService.sendVerificationEmail(savedUser.getEmail(), token);
+        try{
+            emailService.sendVerificationEmail(savedUser.getEmail(), token);
+        }catch (Exception e){
+            log.error("could not end verification email",e);
+        }
 
 
         return new AuthResponse(UserResponse.from(user), token);
@@ -81,6 +91,8 @@ public class AuthController {
     public ResponseEntity<?> verifyEmail(@RequestParam("token") String token,HttpServletResponse response){
        VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
                 .orElseThrow(() -> new RuntimeException("verification token could not be found"));
+
+
 
        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())){
            return ResponseEntity.badRequest().body("token already expired");
@@ -184,6 +196,44 @@ public class AuthController {
         User fresh = userRepository.findById(user.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
         return UserResponse.from(fresh);
+    }
+
+    private final Map<String, Instant> resendCooldown = new ConcurrentHashMap<>();
+
+    @PostMapping("/resend-verification")
+    @Transactional
+    public ResponseEntity<?> resendVerification(@RequestBody Map<String, String> body) {
+        String email = body.getOrDefault("email", "").toLowerCase().trim();
+
+        if (email.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("detail", "Email is required."));
+        }
+
+        // 60-second cooldown per email
+        Instant last = resendCooldown.get(email);
+        if (last != null && last.plusSeconds(60).isAfter(Instant.now())) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(Map.of("detail", "Please wait a minute before requesting another email."));
+        }
+        resendCooldown.put(email, Instant.now());
+
+        userRepository.findByEmail(email).ifPresent(user -> {
+            if (!user.isEnabled()) {
+                verificationTokenRepository.deleteByUserId(user.getId());
+
+                String token = UUID.randomUUID().toString();
+                verificationTokenRepository.save(new VerificationToken(token, user.getId()));
+
+                try {
+                    emailService.sendVerificationEmail(user.getEmail(), token);
+                } catch (Exception e) {
+                    log.error("Could not resend verification email", e);
+                }
+            }
+        });
+
+        // Same response whether or not the account exists, so nobody can probe for registered emails
+        return ResponseEntity.ok(Map.of("message", "Verification email resent"));
     }
 
     private String generateReferralCode() {

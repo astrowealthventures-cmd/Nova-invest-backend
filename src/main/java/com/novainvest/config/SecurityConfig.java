@@ -54,6 +54,7 @@ public class SecurityConfig {
                                 "/api/market/ticker",
                                 "/api/auth/verify-forgotten-password",
                                 "/api/auth/forgotten-password",
+                                "/api/auth/resend-verification",
                                 "/api/"
                         ).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
